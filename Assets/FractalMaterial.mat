@@ -78,9 +78,9 @@ Material:
     - _SrcBlend: 1
     - _UVSec: 0
     - _ZWrite: 1
-    - _Zoom: 10
+    - _Zoom: 1.6172093
     m_Colors:
-    - _Center: {r: 0, g: 0, b: 0, a: 0}
+    - _Center: {r: -0.17890546, g: 0.12702517, b: 0, a: 0}
     - _Color: {r: 0.9987322, g: 1, b: 0, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _GradientEnd: {r: 1, g: 0, b: 0.20098019, a: 1}

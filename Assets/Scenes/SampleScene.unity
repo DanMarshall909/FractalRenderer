@@ -238,6 +238,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1700858563}
   - component: {fileID: 1700858564}
+  - component: {fileID: 1700858565}
   m_Layer: 0
   m_Name: FractalController
   m_TagString: Untagged
@@ -267,7 +268,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1700858562}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f6d584c12ab4b3e4e88ead3e3674da35, type: 3}
   m_Name: 
@@ -275,6 +276,24 @@ MonoBehaviour:
   fractalMaterial: {fileID: 2100000, guid: 27e7d34e59076a54f97ac9939326068e, type: 2}
   zoomSpeed: 5
   panSpeed: 1
+--- !u!114 &1700858565
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1700858562}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8170ded812c0e334ba29d9a6ae52b858, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fractalMaterial: {fileID: 2100000, guid: 27e7d34e59076a54f97ac9939326068e, type: 2}
+  transitionSpeed: 0.5
+  pauseDuration: 1
+  minZoom: 0.5
+  maxZoom: 10
+  easeInStrength: 1
 --- !u!1 &1895188726
 GameObject:
   m_ObjectHideFlags: 0
