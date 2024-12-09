@@ -7,8 +7,6 @@ Shader "Custom/FractalShader"
         _Zoom("Zoom", Float) = 1.0
         _Center("Fractal Center", Vector) = (0.0, 0.0, 0.0, 0.0)
         _c("Fractal Constant", Vector) = (-0.8, 0.156, 0.0, 0.0)
-        _GradientStart("Gradient Start", Color) = (0.1, 0.2, 0.8, 1.0)
-        _GradientEnd("Gradient End", Color) = (1.0, 0.8, 0.2, 1.0)
     }
 
     SubShader
@@ -27,8 +25,6 @@ Shader "Custom/FractalShader"
             float _Zoom;
             float4 _Center;
             float4 _c;
-            float4 _GradientStart;
-            float4 _GradientEnd;
 
             // Vertex data
             struct appdata_t
@@ -51,6 +47,25 @@ Shader "Custom/FractalShader"
                 o.pos = UnityObjectToClipPos(v.vertex);
                 o.uv = v.vertex.xy * 0.5 + 0.5; // UV mapping
                 return o;
+            }
+
+            // HSV to RGB conversion
+            float3 HSVtoRGB(float3 hsv)
+            {
+                float h = hsv.x * 6.0; // Hue range: [0, 6]
+                float s = hsv.y;
+                float v = hsv.z;
+
+                float c = v * s;
+                float x = c * (1.0 - abs(fmod(h, 2.0) - 1.0));
+                float m = v - c;
+
+                if (h < 1.0) return float3(c, x, 0.0) + m;
+                if (h < 2.0) return float3(x, c, 0.0) + m;
+                if (h < 3.0) return float3(0.0, c, x) + m;
+                if (h < 4.0) return float3(0.0, x, c) + m;
+                if (h < 5.0) return float3(x, 0.0, c) + m;
+                return float3(c, 0.0, x) + m;
             }
 
             // Fractal rendering logic in fragment shader
@@ -79,10 +94,11 @@ Shader "Custom/FractalShader"
                     }
                 }
 
-                // Generate a gradient based on the iteration count
-                float3 gradient = lerp(_GradientStart.rgb, _GradientEnd.rgb, colorValue);
+                // Generate a rainbow gradient based on the iteration count
+                float3 hsv = float3(colorValue, 1.0, 1.0); // Hue = iteration ratio, Full Saturation and Value
+                float3 rainbowColor = HSVtoRGB(hsv);
 
-                return float4(gradient, 1.0); // Return the color as RGBA
+                return float4(rainbowColor, 1.0); // Return the rainbow color as RGBA
             }
             ENDCG
         }
