@@ -45,8 +45,11 @@ public class FractalZoom : MonoBehaviour
 
     void OnZoom(InputAction.CallbackContext context)
     {
-        // Get scroll input
-        float scroll = context.ReadValue<float>();
+        // Read the scroll value as a Vector2
+        Vector2 scrollDelta = context.ReadValue<Vector2>();
+
+        // Use only the vertical component for zooming
+        float scroll = scrollDelta.y;
 
         // Adjust zoom level
         currentZoom -= scroll * zoomSpeed * Time.deltaTime;
@@ -55,6 +58,7 @@ public class FractalZoom : MonoBehaviour
         // Update shader
         fractalMaterial.SetFloat("_Zoom", currentZoom);
     }
+
 
     void OnPan(InputAction.CallbackContext context)
     {
