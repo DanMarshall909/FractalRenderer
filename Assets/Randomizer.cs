@@ -1,21 +1,21 @@
 using UnityEngine;
 
-public class FractalRandomPan : MonoBehaviour
+public class FractalConstrainedPan : MonoBehaviour
 {
     public Material fractalMaterial; // Reference to the fractal material
     public float transitionSpeed = 0.5f; // Speed of panning and zooming
-    public float pauseDuration = 0.3f; // Pause duration at each position
+    public float pauseDuration = 1.0f; // Pause duration at each position
     public float minZoom = 0.5f; // Minimum zoom level
-    public float maxZoom = 2f; // Maximum zoom level
+    public float maxZoom = 10f; // Maximum zoom level
     public float easeInStrength = 2f; // Strength of the ease-in (higher = sharper)
 
-    private Vector2 _currentCenter; // Current fractal center
-    private Vector2 _targetCenter; // Target fractal center
-    private float _currentZoom; // Current zoom level
-    private float _targetZoom; // Target zoom level
-    private float _transitionProgress = 0f; // Progress of the current transition
-    private bool _isTransitioning = true; // Whether we are currently transitioning
-    private float _pauseTimer = 0f; // Timer for the pause duration
+    private Vector2 currentCenter; // Current fractal center
+    private Vector2 targetCenter; // Target fractal center
+    private float currentZoom; // Current zoom level
+    private float targetZoom; // Target zoom level
+    private float transitionProgress = 0f; // Progress of the current transition
+    private bool isTransitioning = true; // Whether we are currently transitioning
+    private float pauseTimer = 0f; // Timer for the pause duration
 
     void Start()
     {
@@ -28,57 +28,66 @@ public class FractalRandomPan : MonoBehaviour
         }
 
         var initialCenter = fractalMaterial.GetVector("_Center");
-        _currentCenter = new Vector2(initialCenter.x, initialCenter.y);
-        _targetCenter = GenerateRandomCoordinates();
-        _currentZoom = fractalMaterial.GetFloat("_Zoom");
-        _targetZoom = Random.Range(minZoom, maxZoom);
+        currentCenter = new Vector2(initialCenter.x, initialCenter.y);
+        targetCenter = SelectInterestingArea();
+        currentZoom = fractalMaterial.GetFloat("_Zoom");
+        targetZoom = Random.Range(minZoom, maxZoom);
     }
 
     void Update()
     {
-        if (_isTransitioning)
+        if (isTransitioning)
         {
             // Smoothly interpolate towards the target with ease-in
-            _transitionProgress += transitionSpeed * Time.deltaTime;
-            float easedProgress = EaseInOut(_transitionProgress, easeInStrength);
+            transitionProgress += transitionSpeed * Time.deltaTime;
+            float easedProgress = EaseInOut(transitionProgress, easeInStrength);
 
-            _currentCenter = Vector2.Lerp(_currentCenter, _targetCenter, easedProgress);
-            _currentZoom = Mathf.Lerp(_currentZoom, _targetZoom, easedProgress);
+            currentCenter = Vector2.Lerp(currentCenter, targetCenter, easedProgress);
+            currentZoom = Mathf.Lerp(currentZoom, targetZoom, easedProgress);
 
             // Update shader parameters
-            fractalMaterial.SetVector("_Center", new Vector4(_currentCenter.x, _currentCenter.y, 0.0f, 0.0f));
-            fractalMaterial.SetFloat("_Zoom", _currentZoom);
+            fractalMaterial.SetVector("_Center", new Vector4(currentCenter.x, currentCenter.y, 0.0f, 0.0f));
+            fractalMaterial.SetFloat("_Zoom", currentZoom);
 
             // If transition is complete, start the pause timer
-            if (_transitionProgress >= 1f)
+            if (transitionProgress >= 1f)
             {
-                _isTransitioning = false;
-                _pauseTimer = pauseDuration;
+                isTransitioning = false;
+                pauseTimer = pauseDuration;
             }
         }
         else
         {
             // Countdown the pause timer
-            _pauseTimer -= Time.deltaTime;
+            pauseTimer -= Time.deltaTime;
 
             // When the pause is over, pick a new target and start transitioning
-            if (_pauseTimer <= 0f)
+            if (pauseTimer <= 0f)
             {
-                _targetCenter = GenerateRandomCoordinates();
-                _targetZoom = Random.Range(minZoom, maxZoom);
-                _transitionProgress = 0f;
-                _isTransitioning = true;
+                targetCenter = SelectInterestingArea();
+                targetZoom = Random.Range(minZoom, maxZoom);
+                transitionProgress = 0f;
+                isTransitioning = true;
             }
         }
     }
 
-    // Generate random fractal coordinates
-    private Vector2 GenerateRandomCoordinates()
+    // Select an interesting area in the fractal
+    private Vector2 SelectInterestingArea()
     {
-        return new Vector2(
-            Random.Range(-2.0f, 2.0f), // X range
-            Random.Range(-1.5f, 1.5f)  // Y range
-        );
+        Vector2[] interestingAreas = new Vector2[]
+        {
+            new(-0.745f, 0.113f), // Seahorse Valley
+            new(-0.1011f, 0.9563f), // Elephant Valley
+            new(-1.25066f, 0.02012f), // Spiral Detail
+            new(-1.401f, -0.000f), // Mini Mandelbrot
+            new(0.001643721971153f, -0.822467633298876f) // Triple Spiral Arm
+        };
+
+        // Choose a random interesting area and add a slight offset for variety
+        Vector2 selectedArea = interestingAreas[Random.Range(0, interestingAreas.Length)];
+        selectedArea += new Vector2(Random.Range(-0.005f, 0.005f), Random.Range(-0.005f, 0.005f)); // Small random variation
+        return selectedArea;
     }
 
     // Ease-in-out function with adjustable acceleration strength
